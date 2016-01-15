@@ -57,11 +57,13 @@ exports.default = function (options) {
       var html = undefined;
       if (options.reactRouter && files[file].path) {
         if (!options.routes) {
-          throw new Error('Did not specify options.routes param. Ex. {routes: "./src/routes.jsx"}');
+          throw new Error('Did not specify options.routes param. Ex. {routes: path.resolve(__dirname, {"./src/routes.jsx"})}');
         }
         var routes = require(options.routes);
         (0, _reactRouter.match)({ routes: routes, location: files[file].path }, function (error, redirectLocation, renderProps) {
-          html = _server2.default[options.reactRender](_reactRouter.RoutingContext.apply(undefined, _toConsumableArray(renderProps)));
+          var factory = _react2.default.createFactory(_reactRouter.RoutingContext);
+          var props = renderProps !== undefined ? renderProps : {};
+          html = _server2.default[options.reactRender](factory.apply(undefined, _toConsumableArray(props)));
         });
       } else {
         html = _server2.default[options.reactRender](component);

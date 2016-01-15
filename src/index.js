@@ -38,11 +38,13 @@ export default (options) => {
         let html;
         if (options.reactRouter && files[file].path) {
           if (!options.routes) {
-            throw new Error('Did not specify options.routes param. Ex. {routes: "./src/routes.jsx"}')
+            throw new Error('Did not specify options.routes param. Ex. {routes: path.resolve(__dirname, {"./src/routes.jsx"})}')
           }
           const routes = require(options.routes)
           match({ routes, location: files[file].path }, (error, redirectLocation, renderProps) => {
-            html = ReactDOMServer[options.reactRender](RoutingContext(...renderProps));
+            let factory = React.createFactory(RoutingContext);
+            let props = renderProps !== undefined ? renderProps : {};
+            html = ReactDOMServer[options.reactRender](factory(...props));
           })
         } else {
           html = ReactDOMServer[options.reactRender](component);
