@@ -54,16 +54,17 @@ exports.default = function (options) {
         file: files[file]
       }));
 
+      var html = undefined;
       if (options.reactRouter && files[file].path) {
         if (!options.routes) {
           throw new Error('Did not specify options.routes param. Ex. {routes: "./src/routes.jsx"}');
         }
         var routes = require(options.routes);
         (0, _reactRouter.match)({ routes: routes, location: files[file].path }, function (error, redirectLocation, renderProps) {
-          var html = _server2.default[options.reactRender](_reactRouter.RoutingContext.apply(undefined, _toConsumableArray(renderProps)));
+          html = _server2.default[options.reactRender](_reactRouter.RoutingContext.apply(undefined, _toConsumableArray(renderProps)));
         });
       } else {
-        var _html = _server2.default[options.reactRender](component);
+        html = _server2.default[options.reactRender](component);
       }
 
       try {
