@@ -4,7 +4,7 @@ import multimatch from "multimatch"
 import {each} from "async"
 import React from "react"
 import ReactDOMServer from "react-dom/server"
-import { match, RoutingContext } from "react-router"
+import { Router, match, RouterContext } from "react-router"
 
 export default (options) => {
   options = {
@@ -42,9 +42,11 @@ export default (options) => {
           }
           const routes = require(options.routes)
           match({ routes, location: files[file].path }, (error, redirectLocation, renderProps) => {
-            let factory = React.createFactory(RoutingContext);
+            let factory = React.createFactory(RouterContext);
             let props = renderProps !== undefined ? renderProps : {};
-            html = ReactDOMServer[options.reactRender](factory(...props));
+            html = ReactDOMServer[options.reactRender](factory({
+              router: Router
+            }));
           })
         } else {
           html = ReactDOMServer[options.reactRender](component);

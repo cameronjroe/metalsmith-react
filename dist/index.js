@@ -28,8 +28,6 @@ var _reactRouter = require("react-router");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 exports.default = function (options) {
   options = _extends({
     templatesPath: "templates",
@@ -61,9 +59,11 @@ exports.default = function (options) {
         }
         var routes = require(options.routes);
         (0, _reactRouter.match)({ routes: routes, location: files[file].path }, function (error, redirectLocation, renderProps) {
-          var factory = _react2.default.createFactory(_reactRouter.RoutingContext);
+          var factory = _react2.default.createFactory(_reactRouter.RouterContext);
           var props = renderProps !== undefined ? renderProps : {};
-          html = _server2.default[options.reactRender](factory.apply(undefined, _toConsumableArray(props)));
+          html = _server2.default[options.reactRender](factory({
+            router: _reactRouter.Router
+          }));
         });
       } else {
         html = _server2.default[options.reactRender](component);
