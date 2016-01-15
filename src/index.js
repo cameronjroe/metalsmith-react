@@ -4,6 +4,7 @@ import multimatch from "multimatch"
 import {each} from "async"
 import React from "react"
 import ReactDOMServer from "react-dom/server"
+import { match, RoutingContext } from "react-router"
 
 export default (options) => {
   options = {
@@ -14,6 +15,8 @@ export default (options) => {
     before: "",
     after: "",
     reactRender: "renderToStaticMarkup", // or renderToString
+    reactRouter: false,
+    routes: '',
     ...options,
   }
 
@@ -32,10 +35,22 @@ export default (options) => {
           file: files[file],
         })
 
+        if (options.reactRouter && files[file].path) {
+          if (!options.routes) {
+            throw new Error('Did not specify options.routes param. Ex. {routes: "./src/routes.jsx"}')
+          }
+          const routes = require(options.routes)
+          match({ routes, location: files[file].path }, (error, redirectLocation, renderProps) => {
+            const html = ReactDOMServer[options.reactRender](RoutingContext(...renderProps));
+          })
+        } else {
+          const html = ReactDOMServer[options.reactRender](component);
+        }
+
         try {
           files[file].contents = new Buffer(
             options.before +
-            ReactDOMServer[options.reactRender](component) +
+            html +
             options.after
           )
         }

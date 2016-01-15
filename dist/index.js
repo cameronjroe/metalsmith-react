@@ -24,7 +24,11 @@ var _server = require("react-dom/server");
 
 var _server2 = _interopRequireDefault(_server);
 
+var _reactRouter = require("react-router");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 exports.default = function (options) {
   options = _extends({
@@ -34,7 +38,10 @@ exports.default = function (options) {
     data: {},
     before: "",
     after: "",
-    reactRender: "renderToStaticMarkup" }, options);
+    reactRender: "renderToStaticMarkup", // or renderToString
+    reactRouter: false,
+    routes: ''
+  }, options);
 
   return function (files, metalsmith, done) {
     var metadata = metalsmith.metadata();
@@ -47,8 +54,20 @@ exports.default = function (options) {
         file: files[file]
       }));
 
+      if (options.reactRouter && files[file].path) {
+        if (!options.routes) {
+          throw new Error('Did not specify options.routes param. Ex. {routes: "./src/routes.jsx"}');
+        }
+        var routes = require(options.routes);
+        (0, _reactRouter.match)({ routes: routes, location: files[file].path }, function (error, redirectLocation, renderProps) {
+          var html = _server2.default[options.reactRender](_reactRouter.RoutingContext.apply(undefined, _toConsumableArray(renderProps)));
+        });
+      } else {
+        var _html = _server2.default[options.reactRender](component);
+      }
+
       try {
-        files[file].contents = new Buffer(options.before + _server2.default[options.reactRender](component) + options.after);
+        files[file].contents = new Buffer(options.before + html + options.after);
       } catch (err) {
         cb(err);
       }
