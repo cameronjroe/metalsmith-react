@@ -4,12 +4,16 @@ export default class DefaultTemplate extends Component {
 
   static displayName = "DefaultTemplate";
 
+  static contextTypes = {
+    file: PropTypes.object
+  };
+
   render() {
     return (
       <html>
         <body>
           <a>{this.props.a}</a>
-          <div dangerouslySetInnerHTML={{__html: this.context.file.contents}} />
+          {this.props.children}
         </body>
       </html>
     )

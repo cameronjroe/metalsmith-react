@@ -68,17 +68,20 @@ export default (options) => {
             throw new Error('Did not specify options.routes param. Ex. {routes: path.resolve(__dirname, {"./src/routes.jsx"})}')
           }
           const routes = require(options.routes).default
-          match({ routes, location: files[file].location.href }, (error, redirectLocation, renderProps) => {
+          match({
+            routes,
+            location: files[file].location.href
+          }, (error, redirectLocation, renderProps) => {
+
+            console.log('routes: ', routes);
+            console.log('matched: ', files[file].location.href);
+
             let factory = React.createFactory(ContainerComponent);
             html = ReactDOMServer[options.reactRender](factory({
               ...metadata,
               ...options.data,
               file: files[file],
-              router: renderProps.router,
-              location: renderProps.location,
-              routes: renderProps.routes,
-              params: renderProps.params,
-              components: renderProps.components
+              ...renderProps
             }));
           })
         } else {

@@ -2,6 +2,9 @@ import tape from "tape"
 import path from 'path'
 
 import Metalsmith from "metalsmith"
+import permalinks from 'metalsmith-permalinks'
+import markdown from 'metalsmith-markdown'
+import collections from 'metalsmith-collections'
 import paths from 'metalsmith-paths'
 import react from "../src"
 
@@ -88,21 +91,26 @@ tape("metalsmith-react", test => {
   test.test("react router", (t) => {
     new Metalsmith(__dirname)
       .destination("build/react-router")
+      .use(markdown())
+      .use(permalinks({
+        pattern: ':title'
+      }))
       .use(paths({
         property: "location"
       }))
       .use(react({
-        pattern: '**/*.md',
+        pattern: '**/*.html',
         templatesPath: 'modules',
         reactRender: 'renderToString',
         reactRouter: true,
         routes: path.resolve(__dirname, './modules/routes.jsx')
       }))
       .use((files) => {
+        // console.log(files['about/index.html']);
         t.ok(
-          files['2.md'].contents.toString().indexOf(`<html data-reactid=`) > -1,
-          "should render root route as html react component"
-          )
+          files['about/index.html'].contents.toString().indexOf(`<html data-reactid=`) > -1,
+          "should render route as react component"
+        )
         t.end()
       })
       .build(err => {if (err) {throw err}})
