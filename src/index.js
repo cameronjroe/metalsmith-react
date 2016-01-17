@@ -55,8 +55,8 @@ export default (options) => {
       (file, cb) => {
         const template = metalsmith.path(path.join(options.templatesPath, files[file].template || options.defaultTemplate))
         const reactClass = require(template).default
-        const factory = React.createFactory(reactClass);
-        const component = new factory({
+        const templateFactory = React.createFactory(reactClass);
+        const component = new templateFactory({
           ...metadata,
           ...options.data,
           file: files[file],
@@ -73,16 +73,18 @@ export default (options) => {
             location: files[file].location.href
           }, (error, redirectLocation, renderProps) => {
 
-            console.log('routes: ', routes);
-            console.log('matched: ', files[file].location.href);
+            if (renderProps) {
+              let factory = React.createFactory(ContainerComponent);
+              html = ReactDOMServer[options.reactRender](factory({
+                ...metadata,
+                ...options.data,
+                file: files[file],
+                ...renderProps
+              }));
+            } else {
+              html = ReactDOMServer[options.reactRender](component);
+            }
 
-            let factory = React.createFactory(ContainerComponent);
-            html = ReactDOMServer[options.reactRender](factory({
-              ...metadata,
-              ...options.data,
-              file: files[file],
-              ...renderProps
-            }));
           })
         } else {
           html = ReactDOMServer[options.reactRender](component);

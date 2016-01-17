@@ -106,7 +106,6 @@ tape("metalsmith-react", test => {
         routes: path.resolve(__dirname, './modules/routes.jsx')
       }))
       .use((files) => {
-        // console.log(files['about/index.html']);
         t.ok(
           files['about/index.html'].contents.toString().indexOf(`<html data-reactid=`) > -1,
           "should render route as react component"
